@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase training</title>
+    <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-database.js"></script>
+
+    <script type="application/javascript">
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('form').addEventListener('submit', function sendData(event) {
+                event.preventDefault();
+                const nickname = document.getElementById('nickname');
+                const content = document.getElementById('content');
+                const key = database.ref('messages').push().key;
+                database.ref(`messages/${key}`).update({
+                    nickname: nickname.value,
+                    content: content.value
+                });
+                content.value = '';
+            });
+            database.ref('messages').on('value', function (snapshot) {
+                const data = snapshot.val();
+                const messages = document.getElementById('messages');
+                messages.innerHTML = '';
+                for (const key in data) {
+                    messages.innerHTML += `<div><b>${data[key].nickname}</b>: ${data[key].content}</div>`;
+                }
+            });
+        });
+    </script>
+    <style type="text/css">
+        .wrapper {
+            height: 100%;
+        }
+
+        .app {
+            width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="app">
+        <h4>Чат на firebase</h4>
+        <form id="form">
+            <div>
+                <label>
+                    Никнейм:&nbsp;
+                    <input id="nickname" type="text" name="nickname"/>
+                </label>
+            </div>
+            <div>
+                <label>
+                    Сообщение:&nbsp;
+                    <input id="content" type="text" name="content"/>
+                </label>
+            </div>
+            <button type="submit">Отправить</button>
+        </form>
+        <div id="messages"></div>
+    </div>
+
+</div>
+
+</body>
+</html>
